@@ -35,7 +35,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:8px 0 3px}
 <main id="list"></main>
 <button class="fab" onclick="edit(-1)" id="fab" aria-label="Add"></button>
 <dialog id="dl"><form method="dialog" onsubmit="return false"><div id="fm"></div><div class="row" style="margin-top:14px"><button class="g" onclick="dl.close()">Cancel</button><button style="background:#c62828;display:none" id="del" onclick="remove()">Delete</button><button onclick="save()">Save</button></div></form></dialog>
-<dialog id="ds"><div class="s">Google Apps Script web app URL (for sheet sync). Leave empty to work offline.</div><input id="url" placeholder="https://script.google.com/macros/s/…/exec"><div class="row" style="margin-top:14px"><button class="g" onclick="ds.close()">Close</button><button onclick="setUrl()">Save</button></div></dialog>
+<dialog id="ds"><div class="s">Google Apps Script web app URL (for sheet sync). Leave empty to work offline.</div><input id="url" placeholder="https://script.google.com/macros/s/…/exec"><button class="g" style="margin-top:12px;width:100%" onclick="restore()">Restore original list</button><div class="row" style="margin-top:14px"><button class="g" onclick="ds.close()">Close</button><button onclick="setUrl()">Save</button></div></dialog>
 <dialog id="dbc" style="max-height:88vh;overflow:auto"><b>Broadcast Message</b>
 <label>Message (use {name} to insert each customer’s name)</label><textarea id="bm" rows="4" placeholder="Hi {name}, your meal is on its way." oninput="bc()"></textarea>
 <label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="skipv" checked onchange="bc()" style="width:auto"> Skip customers on vacation</label>
@@ -86,11 +86,12 @@ function save(){const r=[...$("fm").querySelectorAll("[data-k]")].map(e=>e.value
  if(idx<0)DB[tab].push(r);else DB[tab][idx]=r;fin()}
 function remove(){if(confirm("Delete this entry?")){DB[tab].splice(idx,1);fin()}}
 function fin(){store();dl.close();draw();push()}
+function restore(){if(confirm("Restore the original list of "+SEED.Customers.length+" customers? This replaces the current data (and the Google Sheet, if sync is on).")){DB=JSON.parse(JSON.stringify(SEED));store();ds.close();draw();push()}}
 function openSet(){$("url").value=URL_;ds.showModal()}
 function setUrl(){URL_=$("url").value.trim();localStorage.setItem("sync_url",URL_);ds.close();doSync()}
 async function push(){if(!URL_)return;try{await fetch(URL_,{method:"POST",mode:"no-cors",body:JSON.stringify(DB)})}catch(e){}}
 async function doSync(){if(!URL_){openSet();return}syS("Syncing");
- try{const r=await fetch(URL_),d=await r.json();for(const t in H)if(Array.isArray(d[t]))DB[t]=d[t];store();draw();syS("Synced")}catch(e){syS("Failed")}
+ try{const r=await fetch(URL_),d=await r.json();for(const t in H)if(Array.isArray(d[t])&&d[t].length)DB[t]=d[t];store();draw();if(!(d.Customers||[]).length)push();syS("Synced")}catch(e){syS("Failed")}
  setTimeout(()=>syS("Sync"),2500)}
 let sent=new Set();
 function bcRows(){const t=tab=="Leave"?"Customers":tab,q=$("q").value.toLowerCase(),zi=col(t,"Zone"),ai=col(t,"Adjacent Location"),mi=col(t,"Meal"),si=col(t,"Status");
