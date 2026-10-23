@@ -18,35 +18,46 @@ main{padding:8px 12px}h2{font-size:13px;text-transform:uppercase;letter-spacing:
 .c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:8px}
 .n{font-weight:600;font-size:16px}.s{color:var(--mu);font-size:13px;margin-top:2px}
 .b{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bd);margin:4px 4px 0 0}.v{background:#fde2c8;color:#7a3b00}
-.a{display:flex;gap:6px;margin-top:10px}.a a,.a button{flex:1;text-align:center;text-decoration:none;color:#fff;padding:10px 0;border-radius:10px;font-size:14px;border:0}
-.call{background:#2e7d32}.wa{background:#1fa855}.mp{background:#1565c0}.ed{background:var(--card)!important;color:var(--tx)!important;border:1px solid var(--bd)!important;flex:.6!important}
+.a{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.a a,.a button{flex:1 1 28%;text-align:center;text-decoration:none;color:#fff;padding:10px 0;border-radius:10px;font-size:14px;border:0}
+.call{background:#2e7d32}.wa{background:#1fa855}.mp{background:#1565c0}.wz{background:#05a5d1}.ed{background:var(--card)!important;color:var(--tx)!important;border:1px solid var(--bd)!important;flex:.6!important}
 .fab{position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom) + 16px);width:56px;height:56px;border-radius:28px;font-size:28px;padding:0;box-shadow:0 4px 12px #0004}
 dialog{border:0;border-radius:16px;width:92%;max-width:420px;background:var(--bg);color:var(--tx);padding:16px}dialog::backdrop{background:#0008}
 label{display:block;font-size:12px;color:var(--mu);margin:8px 0 3px}
-</style></head><body>
-<header><div class="row"><h1>🛵 Delivery</h1><button class="g" onclick="doSync()" id="sy">⟳ Sync</button><button class="g" onclick="openSet()">⚙︎</button></div>
+.ck{flex:1 1 40%;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:11px 0;font-size:14px}.ck.on{background:#2e7d32;color:#fff;border-color:#2e7d32}.c.dn{border-color:#2e7d32;background:color-mix(in srgb,#2e7d32 12%,var(--card))}#cnt{font-size:13px;color:var(--mu);display:flex;justify-content:space-between;align-items:center;padding:2px 2px 4px}</style></head><body>
+<header><div class="row"><h1>🛵 Delivery</h1><button class="g" onclick="doSync()" id="sy">⟳ Sync</button><button class="g" onclick="openBc()">📢</button><button class="g" onclick="openSet()">⚙︎</button></div>
 <div class="tabs" id="tabs"></div><input id="q" placeholder="Search name, phone, zone…" oninput="draw()">
-<div class="chips" id="zc"></div><div class="chips" id="mc"></div></header>
+<div class="chips" id="zc"></div><div class="chips" id="mc"></div><div id="cnt"></div></header>
 <main id="list"></main>
 <button class="fab" onclick="edit(-1)">+</button>
 <dialog id="dl"><form method="dialog" onsubmit="return false"><div id="fm"></div><div class="row" style="margin-top:14px"><button class="g" onclick="dl.close()">Cancel</button><button style="background:#c62828;display:none" id="del" onclick="remove()">Delete</button><button onclick="save()">Save</button></div></form></dialog>
 <dialog id="ds"><div class="s">Google Apps Script web app URL (for sheet sync). Leave empty to work offline.</div><input id="url" placeholder="https://script.google.com/macros/s/…/exec"><div class="row" style="margin-top:14px"><button class="g" onclick="ds.close()">Close</button><button onclick="setUrl()">Save</button></div></dialog>
+<dialog id="dbc" style="max-height:88vh;overflow:auto"><b>📢 Shobaike message</b>
+<label>Message ({name} likhle protita jon er naam boshbe)</label><textarea id="bm" rows="4" placeholder="Hi {name}, aj ..." oninput="bc()"></textarea>
+<label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="skipv" checked onchange="bc()" style="width:auto"> Vacation er der bad dao</label>
+<div class="s" id="bt" style="margin:8px 0"></div><div id="bl"></div>
+<div class="row" style="margin-top:10px"><button onclick="dbc.close()">Close</button></div></dialog>
 <script>
 const H={"Customers": ["No", "Name", "Phone", "Meal", "Zone", "Adjacent Location", "Map Link / Address", "Notes", "Status"], "Riders": ["No", "Name", "Phone", "Zone", "Adjacent Location", "Notes", "Status"], "Leave": ["Name", "Notes"]}, SEED={"Customers": [[1, "Tony", "+35679496657", "Lunch / Dinner", "Mosta", "", "", "", "Active"], [2, "Akhil", "+35699783572", "Lunch", "Mosta", "", "", "", "Active"], [3, "Ayoob", "+35699464699", "Lunch / Dinner", "Mosta", "", "", "", "Vacation"], [4, "Nafsiya", "+35679490882", "Dinner", "Mosta", "Rabat", "", "", "Active"], [5, "Shahanas", "+35699494209", "Dinner", "Mosta", "", "", "Group", "Active"], [6, "Nithin", "+919633739239", "Dinner", "Mosta", "", "", "Group", "Active"], [7, "Amer", "+35699192996", "Lunch / Dinner", "Mosta", "", "", "Group", "Active"], [8, "Jiby", "+35699301279", "Dinner", "Mosta", "", "", "", "Active"], [13, "Jerin P George", "+35699093421", "Lunch / Dinner", "Mosta", "", "", "Lunch / dinner some days", "Active"], [14, "Shylu", "+35699906495", "Lunch / Dinner", "Mosta", "", "", "Lunch / dinner some days (Mosta some days)", "Active"], [9, "Arun Raj", "+35679005343", "Lunch", "Pavi", "", "", "Lunch only some days", "Active"], [10, "Varsha", "+35699033911", "Lunch", "Pavi", "", "", "", "Active"], [11, "Ramya", "+919526567228", "Lunch", "Pavi", "", "", "", "Active"], [15, "Annop", "+35699374963", "Lunch / Dinner", "Attard", "", "", "Fish fry", "Active"], [16, "Bathusha", "+35699378231", "Lunch / Dinner", "Attard", "", "", "", "Active"], [17, "Sanjay", "+35699915119", "Lunch / Dinner", "Rabat", "", "", "", "Vacation"], [18, "Siril", "+35699638789", "Lunch / Dinner", "Rabat", "", "", "", "Active"], [19, "Sajith", "+35699987092", "Lunch / Dinner", "Mgarr", "", "", "", "Vacation"], [20, "Abhilash", "+35699019251", "Lunch", "Burmarrad", "", "", "", "Active"], [21, "Kiran Raj", "+35699984115", "Lunch", "Burmarrad", "", "", "", "Active"], [24, "Nandu", "+35699953893", "Lunch", "Burmarrad", "", "", "Group", "Active"], [25, "Mohammad", "+35699681458", "Lunch", "Burmarrad", "", "", "Group", "Active"], [26, "Sabastin", "+35699079769", "Lunch", "Burmarrad", "", "", "1 lunch", "Vacation"], [28, "Saied", "+35679361699", "Lunch / Dinner", "Bugibba", "", "", "", "Vacation"], [29, "Antony", "+35699972081", "Lunch", "Bugibba", "", "", "", "Active"], [30, "Shamon", "+35677418248", "Lunch / Dinner", "Bugibba", "", "", "Chapathi", "Active"], [31, "Elezbath", "+35699028709", "Lunch", "Bugibba", "", "", "", "Active"], [32, "Biju Raj", "+35699967399", "Lunch / Dinner", "Bugibba", "", "", "", "Active"], [33, "Ebin", "+35679397001", "Lunch / Dinner", "Bugibba", "", "", "", "Active"], [35, "Amal", "+35699404220", "Lunch", "Bugibba", "", "", "2 lunch", "Active"], [36, "Sandeep", "+35699763980", "Lunch / Dinner", "Bugibba", "", "", "", "Active"], [27, "Fayiz", "+35677120254", "Lunch", "Different location", "", "", "", "Active"], [34, "Renju", "+35699753153", "Lunch / Dinner", "Different location", "", "", "", "Active"], [37, "Albin", "+35699359486", "Lunch / Dinner", "Different location", "Attard", "", "", "Active"], [12, "Abhinav", "+35699559755", "Lunch", "Zone not set", "", "", "", "Active"], [22, "Midhu", "+35699035958", "Lunch", "Zone not set", "", "", "", "Active"], [23, "Anns", "+35699725855", "Lunch", "Zone not set", "", "", "", "Active"]], "Riders": [], "Leave": [["Delip", ""], ["Fabin", ""], ["Vinayan", ""], ["Basil", ""], ["Vishnu", ""], ["Thagaselavam", ""], ["Yuvaraj", ""], ["Some bus driver", ""], ["Dj", ""], ["Pratheep Bugibba", ""]]}, ZONES=["Mosta","Pavi","Attard","Rabat","Mgarr","Burmarrad","Bugibba","Different location","Zone not set"];
 let DB=JSON.parse(localStorage.getItem("dbv1")||"null")||JSON.parse(JSON.stringify(SEED));
 let tab="Customers",zone="All",meal="All",idx=-1,URL_=localStorage.getItem("sync_url")||"";
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const col=(t,n)=>H[t].indexOf(n);
+const TODAY=new Date().toLocaleDateString("en-CA");Object.keys(localStorage).forEach(k=>{if(k.startsWith("done_")&&k!="done_"+TODAY)localStorage.removeItem(k)});let DONE=JSON.parse(localStorage.getItem("done_"+TODAY)||"{}");
+const dk=(r,s)=>r[0]+"-"+r[1]+"-"+s,slots=r=>{const m=String(r[3]),o=[];if(/Lunch/.test(m))o.push("Lunch");if(/Dinner/.test(m))o.push("Dinner");return o};
+function tg(i,s){const k=dk(DB.Customers[i],s);if(DONE[k])delete DONE[k];else DONE[k]=1;localStorage.setItem("done_"+TODAY,JSON.stringify(DONE));draw()}
+function rst(){if(confirm("Ajker shob check mark muche dibe?")){DONE={};localStorage.removeItem("done_"+TODAY);draw()}}
+function cnt(){if(tab!="Customers"){$("cnt").innerHTML="";return}let t=0,d=0;DB.Customers.forEach(r=>{if(r[8]=="Vacation")return;slots(r).forEach(s=>{t++;if(DONE[dk(r,s)])d++})});$("cnt").innerHTML=`<span>✓ ${d} / ${t} delivered ajke</span><button class="g" style="padding:4px 10px;font-size:12px" onclick="rst()">↺ Reset</button>`}
 function store(){localStorage.setItem("dbv1",JSON.stringify(DB))}
 function draw(){
  $("tabs").innerHTML=Object.keys(H).map(t=>`<button class="${t==tab?"on":""}" onclick="tab='${t}';zone='All';meal='All';draw()">${t} (${DB[t].length})</button>`).join("");
  const hasZ=tab!="Leave",hasM=tab=="Customers";
  $("zc").innerHTML=hasZ?["All",...ZONES].map(z=>`<button class="${z==zone?"on":""}" onclick="zone=this.textContent;draw()">${z}</button>`).join(""):"";
- $("mc").innerHTML=hasM?["All","Lunch","Dinner","Vacation"].map(z=>`<button class="${z==meal?"on":""}" onclick="meal=this.textContent;draw()">${z}</button>`).join(""):"";
+ $("mc").innerHTML=hasM?["All","Lunch","Dinner","Vacation","Baki"].map(z=>`<button class="${z==meal?"on":""}" onclick="meal=this.textContent;draw()">${z}</button>`).join(""):"";
  const q=$("q").value.toLowerCase(),h=H[tab],zi=col(tab,"Zone"),ai=col(tab,"Adjacent Location"),mi=col(tab,"Meal"),si=col(tab,"Status");
  let rows=DB[tab].map((r,i)=>[r,i]).filter(([r])=>{
   if(q&&!r.join(" ").toLowerCase().includes(q))return false;
   if(zone!="All"&&r[zi]!=zone&&r[ai]!=zone)return false;
+  if(meal=="Baki")return r[si]!="Vacation"&&slots(r).some(s=>!DONE[dk(r,s)]);
   if(meal=="Vacation")return r[si]=="Vacation";
   if(meal!="All"&&!String(r[mi]).includes(meal))return false;return true});
  let out="",last=null;
@@ -55,11 +66,12 @@ function draw(){
   const nm=r[col(tab,"Name")],ph=hasZ?r[col(tab,"Phone")]:"",dg=String(ph).replace(/\D/g,"");
   const ml=hasM?r[col(tab,"Map Link / Address")]:"",ad=hasZ?r[ai]:"";
   const mq=/^https?:/.test(ml)?ml:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((ml||r[zi]||"")+" Malta");
-  out+=`<div class="c"><div class="row"><div style="flex:1"><div class="n">${hasZ&&r[0]!==""?esc(r[0])+". ":""}${esc(nm)}</div><div class="s">${esc(ph)}</div></div></div>`+
+  const ll=String(ml||"").match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/),wq=hasZ?(ll?`https://waze.com/ul?ll=${ll[1]},${ll[2]}&navigate=yes`:"https://waze.com/ul?q="+encodeURIComponent(((/^https?:/.test(ml)?"":ml)||r[zi]||"")+" Malta")+"&navigate=yes"):"";
+  out+=`<div class="c ${hasM&&slots(r).length&&slots(r).every(s=>DONE[dk(r,s)])?"dn":""}"><div class="row"><div style="flex:1"><div class="n">${hasZ&&r[0]!==""?esc(r[0])+". ":""}${esc(nm)}</div><div class="s">${esc(ph)}</div></div></div>`+
   (hasZ?`<span class="b">${esc(r[zi])}</span>`:"")+(ad?`<span class="b">near: ${esc(ad)}</span>`:"")+(hasM?`<span class="b">${esc(r[mi])}</span>`:"")+(r[si]=="Vacation"?`<span class="b v">Vacation</span>`:"")+
   (r[h.indexOf("Notes")]?`<div class="s">${esc(r[h.indexOf("Notes")])}</div>`:"")+
-  `<div class="a">${hasZ?`<a class="call" href="tel:${esc(ph)}">📞 Call</a><a class="wa" href="https://wa.me/${dg}">💬 WhatsApp</a><a class="mp" href="${esc(mq)}" target="_blank">📍 Map</a>`:""}<button class="ed" onclick="edit(${i})">✎ Edit</button></div></div>`}
- $("list").innerHTML=out||'<div class="s" style="padding:30px;text-align:center">Nothing here yet. Tap + to add.</div>'}
+  `<div class="a">${hasZ?`<a class="call" href="tel:${esc(ph)}">📞 Call</a><a class="wa" href="https://wa.me/${dg}">💬 WhatsApp</a><a class="mp" href="${esc(mq)}" target="_blank">📍 Map</a><a class="wz" href="${esc(wq)}" target="_blank">🚗 Waze</a>`:""}<button class="ed" onclick="edit(${i})">✎ Edit</button></div>${hasM?`<div class="a">${slots(r).map(s=>`<button class="ck ${DONE[dk(r,s)]?"on":""}" onclick="tg(${i},'${s}')">${DONE[dk(r,s)]?"✓":"○"} ${s} delivered</button>`).join("")}</div>`:""}</div>`}
+ cnt();$("list").innerHTML=out||'<div class="s" style="padding:30px;text-align:center">Nothing here yet. Tap + to add.</div>'}
 function edit(i){idx=i;const r=i<0?H[tab].map(h=>h=="No"?(DB[tab].reduce((m,x)=>Math.max(m,+x[0]||0),0)+1):h=="Status"?"Active":""):DB[tab][i];
  $("fm").innerHTML=`<b>${i<0?"Add to":"Edit"} ${tab}</b>`+H[tab].map((h,k)=>`<label>${h}</label>`+(h=="Meal"?`<select data-k="${k}">${["Lunch","Dinner","Lunch / Dinner"].map(o=>`<option ${o==r[k]?"selected":""}>${o}</option>`).join("")}</select>`:h=="Zone"||h=="Adjacent Location"?`<select data-k="${k}"><option value=""></option>${ZONES.map(o=>`<option ${o==r[k]?"selected":""}>${o}</option>`).join("")}</select>`:h=="Status"?`<select data-k="${k}">${["Active","Vacation"].map(o=>`<option ${o==r[k]?"selected":""}>${o}</option>`).join("")}</select>`:`<input data-k="${k}" value="${esc(r[k])}">`)).join("");
  $("del").style.display=i<0?"none":"block";dl.showModal()}
@@ -73,5 +85,14 @@ async function push(){if(!URL_)return;try{await fetch(URL_,{method:"POST",mode:"
 async function doSync(){if(!URL_){openSet();return}$("sy").textContent="…";
  try{const r=await fetch(URL_),d=await r.json();for(const t in H)if(Array.isArray(d[t]))DB[t]=d[t];store();draw();$("sy").textContent="✓ Synced"}catch(e){$("sy").textContent="✗ Failed"}
  setTimeout(()=>$("sy").textContent="⟳ Sync",2500)}
-const dl=$("dl"),ds=$("ds");draw();if(URL_)doSync();
+let sent=new Set();
+function bcRows(){const t=tab=="Leave"?"Customers":tab,q=$("q").value.toLowerCase(),zi=col(t,"Zone"),ai=col(t,"Adjacent Location"),mi=col(t,"Meal"),si=col(t,"Status");
+ return DB[t].filter(r=>{if(q&&!r.join(" ").toLowerCase().includes(q))return false;
+  if(tab!="Leave"){if(zone!="All"&&r[zi]!=zone&&r[ai]!=zone)return false;if(meal=="Vacation"&&r[si]!="Vacation")return false;if(meal!="All"&&meal!="Vacation"&&meal!="Baki"&&!String(r[mi]).includes(meal))return false}
+  if($("skipv").checked&&meal!="Vacation"&&r[si]=="Vacation")return false;return true}).map(r=>({n:r[col(t,"Name")],p:String(r[col(t,"Phone")]).replace(/\D/g,"")}))}
+function openBc(){$("bm").value=localStorage.getItem("bmsg")||"";sent=new Set();bc();dbc.showModal()}
+function bc(){const m=$("bm").value;localStorage.setItem("bmsg",m);const rs=bcRows();
+ $("bt").textContent=rs.length+" jon ("+(tab=="Leave"?"Customers":tab)+", zone: "+(tab=="Leave"?"All":zone)+(meal!="All"&&tab=="Customers"?" / "+meal:"")+")";
+ $("bl").innerHTML=rs.map(x=>`<div class="c row"><div class="n" style="flex:1">${esc(x.n)}</div><a class="wa" style="padding:9px 14px;border-radius:10px;color:#fff;text-decoration:none;${sent.has(x.p)?"opacity:.5":""}" href="https://wa.me/${x.p}?text=${encodeURIComponent(m.split("{name}").join(x.n))}" target="_blank" onclick="sent.add('${x.p}');this.textContent='✓ Sent';this.style.opacity=.5">${sent.has(x.p)?"✓ Sent":"💬 Send"}</a></div>`).join("")}
+const dl=$("dl"),ds=$("ds"),dbc=$("dbc");draw();if(URL_)doSync();
 </script></body></html>
